@@ -1,2 +1,2 @@
 # tweetbot
-A twitter bot which is used to get information about weather of a particular place.
+A twitter bot which is used to get information about weather of a particular place. If @viveks_dev is used in the tweet and if the tweet contains the name of a place then it retweets the weather report
