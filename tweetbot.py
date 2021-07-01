@@ -2,6 +2,7 @@ import re
 import requests
 import tweepy
 import json
+import time
 #import Zalgorithm
 
 t = {
@@ -31,40 +32,43 @@ CONSUMER_SECRET = '3yP4BpQ3kuIQzaYDwgUngHBEob8wUC0OqixoRaGBSXbzNBAEu9'
 ACCESS_KEY = '1241626753333788673-JDkvFV3HimT3nodtsk1DnJKNU6uxP0'
 ACCESS_SECRET = 'dJQbRfQtoueBZDjK5F0Tcwp4iUAA3EKjmp9WERG5J2XKG'
 
-auth = tweepy.OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
-auth.set_access_token(ACCESS_KEY,ACCESS_SECRET)
-api = tweepy.API(auth)
+def re_tweet():
+    auth = tweepy.OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
+    auth.set_access_token(ACCESS_KEY,ACCESS_SECRET)
+    api = tweepy.API(auth)
 
 
-FILE_NAME = '/home/vivek/Desktop/git/tweetbot/last_seen_id.txt'
+    FILE_NAME = '/home/vivek/Desktop/git/tweetbot/last_seen_id.txt'
 
-def retrieve_last_seen_id(file_name):
-    f_read = open(file_name,'r')
-    last_seen_id = int(f_read.read().strip())
-    f_read.close()
-    return last_seen_id
+    def retrieve_last_seen_id(file_name):
+        f_read = open(file_name,'r')
+        last_seen_id = int(f_read.read().strip())
+        f_read.close()
+        return last_seen_id
 
-def store_last_seen_id(last_seen_id,file_name):
-    f_write = open(file_name,'w')
-    f_write.write(str(last_seen_id))
-    f_write.close()
-    return
-    
-last_seen_id = retrieve_last_seen_id(FILE_NAME)
+    def store_last_seen_id(last_seen_id,file_name):
+        f_write = open(file_name,'w')
+        f_write.write(str(last_seen_id))
+        f_write.close()
+        return
+        
+    last_seen_id = retrieve_last_seen_id(FILE_NAME)
 
-mentions = api.mentions_timeline(last_seen_id,tweet_mode='extended')
+    mentions = api.mentions_timeline(last_seen_id,tweet_mode='extended')
 
-for mention in reversed(mentions):
-    place_name = mention.full_text[12:]
+    for mention in reversed(mentions):
+        place_name = mention.full_text[12:]
 
-    print(str(mention.id) + '-' + mention.full_text)
-    last_seen_id = mention.id
-    store_last_seen_id(last_seen_id,FILE_NAME)
-    print("Responding")
-    weather = geo_location(place_name)
+        print(str(mention.id) + '-' + mention.full_text)
+        last_seen_id = mention.id
+        store_last_seen_id(last_seen_id,FILE_NAME)
+        print("Responding")
+        weather = geo_location(place_name)
 
-    api.update_status('@'+ mention.user.screen_name + ' ' +'temperature '+ str(weather['temperature'])+'\n'+str(weather['location']) , mention.id     )
-
-
+        api.update_status('@'+ mention.user.screen_name + ' ' +'temperature '+ str(weather['temperature'])+'\n'+str(weather['location']) , mention.id     )
 
 
+
+while True:
+    time.sleep(15)
+    re_tweet()
