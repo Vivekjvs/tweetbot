@@ -1,7 +1,8 @@
+import re
 import requests
 import tweepy
 import json
-import Zalgorithm
+#import Zalgorithm
 
 t = {
     'units': 'si', 
@@ -25,33 +26,45 @@ def geo_location(location):
         res = requests.get(url, headers={'Accept': 'application/json'},params=t)
         return {'temperature':res.json()['currently']['temperature'],'location':place}
 
-CONSUMER_KEY = 'txre1Rwayk5oiiMoFDHVxKUDH'
-CONSUMER_SECRET = '8ZVq46XkuxghebOvhEX9yrul69s8JdjEp7uqbxP6GsbhJfKTq4'
-ACCESS_KEY = '1241626753333788673-BrinIszBpzqRb2l9MQdvZ4TVTxuQlb'
-ACCESS_SECRET = '1CY2RBO3ZowkpQNQg7RomwJ6E2Xjq3vhlc6HKPG4Q61cT'
+CONSUMER_KEY = 'HcLnk3t9qeY9Bp0hEbImiyCj0'
+CONSUMER_SECRET = '3yP4BpQ3kuIQzaYDwgUngHBEob8wUC0OqixoRaGBSXbzNBAEu9'
+ACCESS_KEY = '1241626753333788673-JDkvFV3HimT3nodtsk1DnJKNU6uxP0'
+ACCESS_SECRET = 'dJQbRfQtoueBZDjK5F0Tcwp4iUAA3EKjmp9WERG5J2XKG'
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY,ACCESS_SECRET)
 api = tweepy.API(auth)
 
-res = api.search(q='viveks_dev', since_id='1241771148032880640')
-with open('data.json') as file:
-    data = json.load(file)
-for i in res:
-    obj = i._json
-    reply_id= obj["in_reply_to_status_id_str"]
-    if reply_id == "1241771148032880640"and not(obj['id_str'] in data['saved_id']):
-        try:
-            data['saved_id'].append(obj['id_str'])
-            text = obj['text']
-            index = Zalgorithm.matching(text,'location')[0] + 8
-            weather = get_temperature(text[index:])
-            tweet = f"@{obj['user']['screen_name']} temperature {str(weather['temperature'])}"+ '\n' +weather['location']
-            print(tweet)
-            # api.update_status(tweet)
-        except:
-            print('err')
-        else:
-            with open('data.json','w') as file:
-                json.dump(data,file)
+
+FILE_NAME = '/home/vivek/Desktop/git/tweetbot/last_seen_id.txt'
+
+def retrieve_last_seen_id(file_name):
+    f_read = open(file_name,'r')
+    last_seen_id = int(f_read.read().strip())
+    f_read.close()
+    return last_seen_id
+
+def store_last_seen_id(last_seen_id,file_name):
+    f_write = open(file_name,'w')
+    f_write.write(str(last_seen_id))
+    f_write.close()
+    return
+    
+last_seen_id = retrieve_last_seen_id(FILE_NAME)
+
+mentions = api.mentions_timeline(last_seen_id,tweet_mode='extended')
+
+for mention in reversed(mentions):
+    place_name = mention.full_text[12:]
+
+    print(str(mention.id) + '-' + mention.full_text)
+    last_seen_id = mention.id
+    store_last_seen_id(last_seen_id,FILE_NAME)
+    print("Responding")
+    weather = geo_location(place_name)
+
+    api.update_status('@'+ mention.user.screen_name + ' ' +'temperature '+ str(weather['temperature'])+'\n'+str(weather['location']) , mention.id     )
+
+
+
 
