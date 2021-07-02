@@ -1,9 +1,7 @@
-
 import requests
 import tweepy
-import Zalgorithm
 import time
-
+import Zalgorithm
 
 t = {
     'units': 'si', 
@@ -29,8 +27,8 @@ def geo_location(location):
 
 CONSUMER_KEY = 'HcLnk3t9qeY9Bp0hEbImiyCj0'
 CONSUMER_SECRET = '3yP4BpQ3kuIQzaYDwgUngHBEob8wUC0OqixoRaGBSXbzNBAEu9'
-ACCESS_KEY = '1241626753333788673-Pc4RywigzwrcvYYzWz137za0bQJqKI'
-ACCESS_SECRET = '6Z6Mtqr3nesIufW8La4YGBpM6FWvk1WyJlqzq8JgIs5Rm'
+ACCESS_KEY = '1241626753333788673-JDkvFV3HimT3nodtsk1DnJKNU6uxP0'
+ACCESS_SECRET = 'dJQbRfQtoueBZDjK5F0Tcwp4iUAA3EKjmp9WERG5J2XKG'
 
 def re_tweet():
     auth = tweepy.OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
@@ -59,7 +57,7 @@ def re_tweet():
     for mention in reversed(mentions):
         text = mention.full_text
         index = Zalgorithm.match(text) + 12
-        place_name = text[12:]
+        place_name = text[index:]
         print(str(mention.id) + '-' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id,FILE_NAME)
