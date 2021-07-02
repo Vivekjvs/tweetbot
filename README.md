@@ -3,4 +3,4 @@ A Twitter bot is used to get information about the weather of a particular place
 
 If you want to run it, change the file name (line number 41) accordingly.
 
-While tweeting, just write the name of the place in the tweet.
+tweet should contain "place:place_name" anywhere
